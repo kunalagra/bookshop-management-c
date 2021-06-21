@@ -5,8 +5,7 @@
 
 struct bookinfo{
 	char name[30],author[20];
-	float price;
-	int id;
+	int id, price;
 }book[1000];
 	
 int choiceCase(int choice){
@@ -28,45 +27,95 @@ int choiceCase(int choice){
 				gets(book[i].author);
 				printf("\nEnter Book Price (in rupee): ");
 				scanf("%d",&book[i].price);
-				fprintf(fcs, "\n%d,%s,%s,%d", book[i].id,book[i].name,book[i].author,book[i].price);
+				fprintf(fcs, "%d,%s,%s,%d\n", book[i].id,book[i].name,book[i].author,book[i].price);
 			}
 			fclose(fcs);
 			printf("Started Writing.");
-			
 			printf("\nCompleted Writing");
 			printf("\nGoing back to main menu..");
 			sleep(3);
 			return 0;
+		case 2:
+			system("cls");
+			fcs = fopen("data.csv","r");
+			char line[1024];
+			int j=0,recnum;
+			char *bid,*bname,*bauth,*bprice;
+			printf("\nReading Books Record..");
+			while (fgets(line, 1024, fcs)!=NULL){
+				bid = strtok(line,",");
+				bname=strtok(NULL, ",");
+				bauth=strtok(NULL, ",");
+				bprice=strtok(NULL, ",");
+				book[j].id = atoi(bid);
+				strcpy(book[j].name,bname);
+				strcpy(book[j].author,bauth);
+				book[j].price = atoi(bprice);
+				j++;
+			}
+			fclose(fcs);
+			record:
+			printf("\nEnter Book ID to Edit: ");
+			scanf("%d",&recnum);
+			int foundflag=0;
+			for(int s=0;s<j;s++){
+				if(recnum==book[s].id){
+					foundflag++;
+					printf("Editing Data for Book ID: %d & Book Name: %s",book[s].id,book[s].name);
+					printf("\n\nEnter new Book Id: ");
+					scanf("%d",&book[s].id);
+					getchar();
+					printf("\nEnter New Book name: ");
+					gets(book[s].name);
+					printf("\nEnter new Book Author: ");
+					gets(book[s].author);
+					printf("\nEnter new Book Price (in rupee): ");
+					scanf("%d",&book[s].price);
+					break;
+				}
+			}
+			if (foundflag==1){
+				printf("\nWriting Changes.. ");
+				fcs = fopen("data.csv","w");
+				for(int s=0;s<j;s++){
+					fprintf(fcs, "%d,%s,%s,%d\n", book[s].id,book[s].name,book[s].author,book[s].price);
+				}
+				fclose(fcs);
+				printf("Returning to Main Menu..");
+				sleep(3);
+				return 0;
+			} 
+			else {
+				printf("Book ID not found!");
+				printf("Returning to Main Menu..");
+				sleep(3);
+				return 0;
+			}
+
 		case 3:
 			system("cls");
 			fcs = fopen("data.csv","r");
 			printf("\nReading Books Record..\n");
-			char line[1024];
-			int j=0;
-			char *bid,*bname,*bauth,*bprice;
-			while (fgets(line, 1024, fcs)!=NULL){
-				bid=strtok(line, ",");
-				bname=strtok(NULL, ",");
-				bauth=strtok(NULL, ",");
-				bprice=strtok(NULL, ",");
+			char line2[1024];
+			char *bid2,*bname2,*bauth2,*bprice2;
+			while (fgets(line2, 1024, fcs)!=NULL){
+				bid2=strtok(line2, ",");
+				bname2=strtok(NULL, ",");
+				bauth2=strtok(NULL, ",");
+				bprice2=strtok(NULL, ",");
 				printf("**************************");
-				printf("\nBook ID: %s \nBook Name: %s \nBook Author: %s \nBook Price: %s",bid,bname,bauth,bprice);
+				printf("\n\nBook ID: %s \nBook Name: %s \nBook Author: %s \nBook Price: %s\n",bid2,bname2,bauth2,bprice2);
 				printf("**************************");
-				j++;
 			}
 			fclose(fcs);
 			int exit1;
 			wait:
-			printf("\nPress 0 to return to main menu");
+			printf("\nPress 0 to return to main menu: ");
 			scanf("%d",&exit1);
 			if (exit1==0)
 				return 0;
 			else
 				goto wait;
-
-
-
-
 	}
 }
 
