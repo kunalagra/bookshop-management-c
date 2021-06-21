@@ -36,7 +36,34 @@ int choiceCase(int choice){
 			printf("\nCompleted Writing");
 			printf("\nGoing back to main menu..");
 			sleep(3);
-			break;
+			return 0;
+		case 3:
+			system("cls");
+			fcs = fopen("data.csv","r");
+			printf("\nReading Books Record..\n");
+			char line[1024];
+			int j=0;
+			char *bid,*bname,*bauth,*bprice;
+			while (fgets(line, 1024, fcs)!=NULL){
+				bid=strtok(line, ",");
+				bname=strtok(NULL, ",");
+				bauth=strtok(NULL, ",");
+				bprice=strtok(NULL, ",");
+				printf("**************************");
+				printf("\nBook ID: %s \nBook Name: %s \nBook Author: %s \nBook Price: %s",bid,bname,bauth,bprice);
+				printf("**************************");
+				j++;
+			}
+			fclose(fcs);
+			int exit1;
+			wait:
+			printf("\nPress 0 to return to main menu");
+			scanf("%d",&exit1);
+			if (exit1==0)
+				return 0;
+			else
+				goto wait;
+
 
 
 
