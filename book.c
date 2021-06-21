@@ -116,6 +116,59 @@ int choiceCase(int choice){
 				return 0;
 			else
 				goto wait;
+		case 4:
+			system("cls");
+			fcs = fopen("data.csv","r");
+			char line3[1024];
+			int jj=0,delid;
+			char *bid3,*bname3,*bauth3,*bprice3;
+			printf("\nReading Books Record..");
+			while (fgets(line3, 1024, fcs)!=NULL){
+				bid3 = strtok(line3,",");
+				bname3=strtok(NULL, ",");
+				bauth3=strtok(NULL, ",");
+				bprice3=strtok(NULL, ",");
+				book[jj].id = atoi(bid3);
+				strcpy(book[jj].name,bname3);
+				strcpy(book[jj].author,bauth3);
+				book[jj].price = atoi(bprice3);
+				jj++;
+			}
+			fclose(fcs);
+			printf("\nEnter the Book ID to delete: ");
+			scanf("%d",&delid);
+			int foundflag2=0;
+			int ss;
+			for(ss=0;ss<=jj;ss++){
+				if(delid==book[ss].id){
+					foundflag2++;
+					break;
+				}
+			}
+			if (foundflag2==1){
+				printf("\nWriting Changes.. ");
+				fcs = fopen("data.csv","w");
+				for(int kk=0;kk<jj;kk++){
+					if(kk==ss){
+						kk++;
+						fprintf(fcs, "%d,%s,%s,%d\n", book[kk].id,book[kk].name,book[kk].author,book[kk].price);
+					}
+					else
+						fprintf(fcs, "%d,%s,%s,%d\n", book[kk].id,book[kk].name,book[kk].author,book[kk].price);
+				}
+				fclose(fcs);
+				printf("\nReturning to Main Menu..");
+				sleep(3);
+				return 0;
+			} 
+			else {
+				printf("Book ID not found!");
+				printf("\nReturning to Main Menu..");
+				sleep(3);
+				return 0;
+			}
+
+			 
 	}
 }
 
