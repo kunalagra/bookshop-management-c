@@ -1,19 +1,33 @@
 #include <stdio.h>
+// stdlib is required for atoi/system & etc
 #include <stdlib.h>
 #include <string.h>	
+// time.h is require for sleep function
 #include <time.h>
+
+/*
+	structure which will hold book info. Data will be temporary stored here
+	memebers are name, author, id & price
+	The no. of book records the structure can hold is upto 1000 
+*/
 
 struct bookinfo{
 	char name[30],author[20];
 	int id, price;
 }book[1000];
 
+// function incase ID is not found
 int notfound(){
-	printf("\nBook ID not found!");
+	printf("\nBook not found!");
 	printf("\nReturning to Main Menu..");
 	sleep(4);
 	return 0;
 }
+
+/* 
+	A generic Wait function instead of force exiting
+	This is used when dsiplaying results where user needs to look at it long enough
+*/
 int wait(){
 	int exit1;
 	wait:
@@ -25,26 +39,47 @@ int wait(){
 		goto wait;
 
 }
-	
+
+
+// Choice Function - uses switch statement at core
 int choiceCase(int choice){
 	FILE *fcs;
+	// Clears the Command Prompt/terminal in Windows
 	system("cls");
+
+	/* 
+		Open the data.csv file
+		A CSV file is a comma separated file which can be opened
+		in notepad, excel & etc. Easy to store & retrieve data from
+	   Incase the file is not found, i.e NULL is returned
+	   We create the file with name data.csv and skip to close part
+	*/
 	fcs = fopen("data.csv","r");
 	if (fcs == NULL){
 		printf("File Not Found.");
 		printf("\nCreating New File..");
-		fcs = fopen("data.csv","a+");
+		fcs = fopen("data.csv","w");
 		goto newfc;
 	}
+	// Defines the maximum length of the line
 	char line[1024];
 	int j=0,inid,foundflag=0;
+	// pointers for usage in strtok to temporary store data
 	char *bid,*bname,*bauth,*bprice;
 	printf("\nReading Books Record..\n");
+	// Reads until End Of File is not reached
 	while (fgets(line, 1024, fcs)!=NULL){
+		/*
+			strtok splits a string using a delimiter, here it is comma (,)
+			in CSV file, a comma is used to define additional column
+			we are storing data in char pointer var
+			and then copying them to the book struct array
+		*/
 		bid = strtok(line,",");
 		bname=strtok(NULL, ",");
 		bauth=strtok(NULL, ",");
 		bprice=strtok(NULL, ",");
+		// atoi is used to convert a string to integer
 		book[j].id = atoi(bid);
 		strcpy(book[j].name,bname);
 		strcpy(book[j].author,bauth);
@@ -55,6 +90,7 @@ int choiceCase(int choice){
 	fclose(fcs);
 	switch (choice){
 		case 1: 
+			// Open the file in Append Mode with new data written from new line
 			fcs = fopen("data.csv","a+");
 			printf("\nNumber Of Books to Add: ");
 			scanf("%d",&inid);
@@ -141,6 +177,7 @@ int choiceCase(int choice){
 					fcs = fopen("data.csv","w");
 					for(int kk=0;kk<j;kk++){
 						if(kk==ss){
+							// Skip the ID to delete
 							kk++;
 							fprintf(fcs, "%d,%s,%s,%d\n", book[kk].id,book[kk].name,book[kk].author,book[kk].price);
 						}
@@ -158,9 +195,10 @@ int choiceCase(int choice){
 			else
 				notfound();
 		case 5:
+			case5:
 			printf("\nPlease choose an option to search Book details: ");
 			int searchopt;
-			printf("\n1. Enter The Book ID\n2. Enter Book Name\n3. By Book Author\nYour Option: ");
+			printf("\n1. By Book ID\n2. By Book Name\n3. By Book Author\n0. Exit\nYour Option: ");
 			scanf("%d",&searchopt);
 			if (searchopt==1){
 				printf("\nEnter Book ID to Search: ");
@@ -196,6 +234,7 @@ int choiceCase(int choice){
 				printf("\nEnter Book Author to search: ");
 				gets(searchauth);
 				int mm;
+				// while loop to print all books of the author
 				while (mm<j){
 					if(strcmp(searchauth,book[mm].author)==0){
 						foundflag=1;
@@ -205,6 +244,13 @@ int choiceCase(int choice){
 					}
 					mm++;
 				}
+			}
+			else if (searchopt==0){
+				break;
+			}
+			else{
+				printf("\n\nPlease choose a valid Option or Enter 0 to exit\n");
+				goto case5;
 			}
 
 			if (foundflag==1){
@@ -216,6 +262,8 @@ int choiceCase(int choice){
 	}
 }
 
+
+// Driver Code
 int main(){
 	START:system("cls");
 	int opt;
