@@ -14,11 +14,28 @@ int notfound(){
 	sleep(4);
 	return 0;
 }
+int wait(){
+	int exit1;
+	wait:
+	printf("\nPress 0 to return to main menu: ");
+	scanf("%d",&exit1);
+	if (exit1==0)
+		return 0;
+	else
+		goto wait;
+
+}
 	
 int choiceCase(int choice){
 	FILE *fcs;
 	system("cls");
 	fcs = fopen("data.csv","r");
+	if (fcs == NULL){
+		printf("File Not Found.");
+		printf("\nCreating New File..");
+		fcs = fopen("data.csv","a+");
+		goto newfc;
+	}
 	char line[1024];
 	int j=0,inid,foundflag=0;
 	char *bid,*bname,*bauth,*bprice;
@@ -34,14 +51,14 @@ int choiceCase(int choice){
 		book[j].price = atoi(bprice);
 		j++;
 	}
+	newfc:
 	fclose(fcs);
 	switch (choice){
 		case 1: 
 			fcs = fopen("data.csv","a+");
 			printf("\nNumber Of Books to Add: ");
 			scanf("%d",&inid);
-			int i;
-			for(i=0;i<inid;i++){
+			for(int i=0;i<inid;i++){
 				printf("\nEnter Book Id: ");
 				scanf("%d",&book[i].id);
 				getchar();
@@ -101,18 +118,12 @@ int choiceCase(int choice){
 				printf("\n**************************");
 			
 			}
-			int exit1;
-			wait:
-			printf("\nPress 0 to return to main menu: ");
-			scanf("%d",&exit1);
-			if (exit1==0)
-				return 0;
-			else
-				goto wait;
-
+			wait();
+			break;
 		case 4:
 			printf("\nEnter the Book ID to delete: ");
 			scanf("%d",&inid);
+			getchar();
 			int ss;
 			for(ss=0;ss<=j;ss++){
 				if(inid==book[ss].id){
@@ -121,45 +132,84 @@ int choiceCase(int choice){
 				}
 			}
 			if (foundflag==1){
-				printf("\nWriting Changes.. ");
-				fcs = fopen("data.csv","w");
-				for(int kk=0;kk<j;kk++){
-					if(kk==ss){
-						kk++;
-						fprintf(fcs, "%d,%s,%s,%d\n", book[kk].id,book[kk].name,book[kk].author,book[kk].price);
+				char confirmdel;
+				printf("Are You sure You want to delete book id: %d and book name: %s",book[ss].id,book[ss].name);
+				printf("\nPress Y to confirm delete or Press any other key to exit: ");
+				scanf("%c",&confirmdel);
+				if ((confirmdel == 'Y')||(confirmdel=='y')){
+					printf("\nWriting Changes.. ");
+					fcs = fopen("data.csv","w");
+					for(int kk=0;kk<j;kk++){
+						if(kk==ss){
+							kk++;
+							fprintf(fcs, "%d,%s,%s,%d\n", book[kk].id,book[kk].name,book[kk].author,book[kk].price);
+						}
+						else
+							fprintf(fcs, "%d,%s,%s,%d\n", book[kk].id,book[kk].name,book[kk].author,book[kk].price);
 					}
-					else
-						fprintf(fcs, "%d,%s,%s,%d\n", book[kk].id,book[kk].name,book[kk].author,book[kk].price);
+					fclose(fcs);
 				}
-				fclose(fcs);
+				else
+					printf("Not Deleting the Record.");
 				printf("\nReturning to Main Menu..");
 				sleep(3);
 				return 0;
 			} 
-			else {
+			else
 				notfound();
-				return 0;
-			}
 		case 5:
-			printf("Enter The Book ID to fetch Details: ");
-			scanf("%d",&inid);
-			for(ss=0;ss<=j;ss++){
-				if(inid==book[ss].id){
+			printf("\nPlease choose an option to search Book details: ");
+			int searchopt;
+			printf("\n1. Enter The Book ID\n2. Enter Book Name\n3. By Book Author\nYour Option: ");
+			scanf("%d",&searchopt);
+			if (searchopt==1){
+				printf("\nEnter Book ID to Search: ");
+				printf("%d",&inid);
+				for(int s=0;s<=j;s++){
+					if(inid==book[s].id){
 					foundflag++;
+					printf("**************************");
+					printf("\n\nBook ID: %d \nBook Name: %s \nBook Author: %s \nBook Price: %d\n",book[s].id,book[s].name,book[s].author,book[s].price);
+					printf("\n**************************");
 					break;
+					}
 				}
 			}
+			else if (searchopt==2){
+				getchar();
+				char searchname[30];
+				printf("\nEnter Book Name to search: ");
+				gets(searchname);
+				for(int s=0;s<=j;s++){
+					if(strcmp(searchname,book[s].name)==0){
+					foundflag++;
+					printf("**************************");
+					printf("\n\nBook ID: %d \nBook Name: %s \nBook Author: %s \nBook Price: %d\n",book[s].id,book[s].name,book[s].author,book[s].price);
+					printf("\n**************************");
+					break;
+					}
+				}
+			}
+			else if (searchopt==3){
+				getchar();
+				char searchauth[20];
+				printf("\nEnter Book Author to search: ");
+				gets(searchauth);
+				int mm;
+				while (mm<j){
+					if(strcmp(searchauth,book[mm].author)==0){
+						foundflag=1;
+						printf("**************************");
+						printf("\n\nBook ID: %d \nBook Name: %s \nBook Author: %s \nBook Price: %d\n",book[mm].id,book[mm].name,book[mm].author,book[mm].price);
+						printf("\n**************************");
+					}
+					mm++;
+				}
+			}
+
 			if (foundflag==1){
-				printf("**************************");
-				printf("\n\nBook ID: %d \nBook Name: %s \nBook Author: %s \nBook Price: %d\n",book[ss].id,book[ss].name,book[ss].author,book[ss].price);
-				printf("\n**************************");
-				printf("\nPress 0 to return to main menu: ");
-				int exit2;
-				scanf("%d",&exit2);
-				if (exit1==0)
-					return 0;
-				else
-					goto wait;
+				wait();
+				break;
 			}
 			else
 				notfound();
