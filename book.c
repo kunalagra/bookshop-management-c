@@ -202,7 +202,7 @@ int choiceCase(int choice){
 			scanf("%d",&searchopt);
 			if (searchopt==1){
 				printf("\nEnter Book ID to Search: ");
-				printf("%d",&inid);
+				scanf("%d",&inid);
 				for(int s=0;s<=j;s++){
 					if(inid==book[s].id){
 					foundflag++;
